@@ -1,247 +1,279 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>单位换算与功率计算器</title>
-  <!-- 引入 Bootstrap 样式 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- 引入 Vue.js -->
+  <title>电力计算器</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
+      margin-top: 20px;
     }
 
     .container {
+      max-width: 960px;
+    }
+
+    .section {
+      background-color: #f9f9f9;
       padding: 20px;
-    }
-
-    .converter-group {
-      margin-bottom: 40px;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background-color: #fff;
-    }
-
-    .converter-title {
-      font-size: 18px;
-      font-weight: bold;
       margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .input-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .input-box {
-      width: 45%;
-      position: relative;
-    }
-
-    .input-box input {
-      width: 100%;
-      padding: 8px;
-      font-size: 14px;
-      border: 1px solid #ccc;
       border-radius: 5px;
-      box-sizing: border-box;
     }
 
-    .swap-sign {
-      width: 10%;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
+    .table th,
+    .table td {
+      vertical-align: middle;
     }
 
-    .power-calculator {
-      display: flex;
-      flex-direction: column;
+    .striped-table tr:nth-child(even) {
+      background-color: #f8f9fa;
     }
 
-    .power-calculator label {
-      margin-bottom: 5px;
-      font-weight: bold;
-      font-size: 14px;
+    .form-inline label {
+      margin-right: 10px;
     }
 
-    .power-calculator input {
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
+    .form-inline input[type="number"] {
+      width: 100px;
     }
 
-    .power-calculator .radio-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .power-calculator .radio-group label {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-    }
-
-    .power-calculator button {
-      padding: 8px 16px;
-      font-size: 14px;
-    }
-
-    .result {
-      font-size: 16px;
-      font-weight: bold;
-      margin-top: 20px;
-      text-align: center;
+    .form-inline button {
+      margin-left: 10px;
     }
   </style>
 </head>
 
 <body>
-  <div id="app" class="container mt-5">
-    <!-- 米 ↔ 英寸 换算 -->
-    <div class="converter-group">
-      <h3 class="converter-title">米 ↔ 英寸</h3>
-      <div class="input-row">
-        <div class="input-box">
-          <input type="number" v-model="meter" @input="convertMeterToInch" placeholder="米 (m)">
+  <div class="container" id="app">
+
+    <!-- 第一部分：信息展示 -->
+    <div class="section">
+      <h2 class="mb-4">信息展示</h2>
+      <table class="table table-bordered striped-table">
+        <thead>
+          <tr>
+            <th scope="col">Calculation</th>
+            <th scope="col">Guide to Standard Units</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Power Calculator</td>
+            <td>Kilo Volt Amperes (kVA)</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Converting kVA to kW</td>
+            <td>KiloWatts (1000 watts = 1 kW)</td>
+            <td>kW</td>
+          </tr>
+          <tr>
+            <td>Converting kW to kVA</td>
+            <td>Ampere (Volt-Amperes or Current)</td>
+            <td>I</td>
+          </tr>
+          <tr>
+            <td>Converting kW to HP</td>
+            <td>Volts</td>
+            <td>E</td>
+          </tr>
+          <tr>
+            <td>Amperes when kVA is known</td>
+            <td>Power Factor</td>
+            <td>PE</td>
+          </tr>
+          <tr>
+            <td>kVA Required to run motors</td>
+            <td>Percent Efficiency</td>
+            <td>%EFF</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>Horse Power (HP)</td>
+            <td>HP</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 第二部分：功率需求计算器 -->
+    <div class="section">
+      <h2 class="mb-4">功率需求计算器</h2>
+      <div class="form-group form-inline mb-3">
+        <label>Phase</label>
+        <div class="custom-control custom-radio custom-control-inline">
+          <input type="radio" id="phase1" v-model="phase" value="1" class="custom-control-input"
+            @change="calculatePowerKW">
+          <label class="custom-control-label" for="phase1">1</label>
         </div>
-        <div class="swap-sign">↔</div>
-        <div class="input-box">
-          <input type="number" v-model="inch" @input="convertInchToMeter" placeholder="英寸 (in)">
+        <div class="custom-control custom-radio custom-control-inline">
+          <input type="radio" id="phase3" v-model="phase" value="3" class="custom-control-input"
+            @change="calculatePowerKW">
+          <label class="custom-control-label" for="phase3">3</label>
         </div>
+        <label>Volts Required (V)</label>
+        <input type="number" v-model.number="volts" class="form-control" required @input="calculatePowerKW">
+        <label>Amperes (I)</label>
+        <input type="number" v-model.number="amperes" class="form-control" required @input="calculatePowerKW">
+        <label>Power Factor</label>
+        <div class="custom-control custom-radio custom-control-inline">
+          <input type="radio" id="pf08" v-model="powerFactor" value="0.8" class="custom-control-input"
+            @change="calculatePowerKW">
+          <label class="custom-control-label" for="pf08">0.8</label>
+        </div>
+        <div class="custom-control custom-radio custom-control-inline">
+          <input type="radio" id="pf1" v-model="powerFactor" value="1" class="custom-control-input"
+            @change="calculatePowerKW">
+          <label class="custom-control-label" for="pf1">1</label>
+        </div>
+        <button type="button" class="btn btn-primary" @click="calculatePowerKW">Calculate Power kW</button>
+        <label>=</label>
+        <input type="text" :value="powerKwResult ? powerKwResult.toFixed(2) : ''" class="form-control" readonly>
       </div>
     </div>
 
-    <!-- kVA ↔ kW 换算 -->
-    <div class="converter-group">
-      <h3 class="converter-title">kVA ↔ kW</h3>
-      <div class="input-row">
-        <div class="input-box">
-          <input type="number" v-model="kva" @input="convertKvaToKw" placeholder="kVA">
-        </div>
-        <div class="swap-sign">↔</div>
-        <div class="input-box">
-          <input type="number" v-model="kw" @input="convertKwToKva" placeholder="kW">
-        </div>
+    <!-- 第三部分：电力单位换算 -->
+    <div class="section">
+      <h2 class="mt-5 mb-4">电力单位换算</h2>
+
+      <div class="form-group form-inline mb-3">
+        <label>Converting kW to kVA</label>
+        <input type="number" v-model.number="kwToKva" class="form-control" placeholder="Enter kW"
+          @input="convertKwToKva">
+        <label>=</label>
+        <input type="number" v-model.number="kvaToKw" class="form-control" placeholder="Enter kVA"
+          @input="convertKvaToKw">
+      </div>
+
+      <div class="form-group form-inline mb-3">
+        <label>Converting kW to HP</label>
+        <input type="number" v-model.number="kwToHp" class="form-control" placeholder="Enter kW" @input="convertKwToHp">
+        <label>=</label>
+        <input type="number" v-model.number="hpToKw" class="form-control" placeholder="Enter HP" @input="convertHpToKw">
+      </div>
+
+      <div class="form-group form-inline mb-3">
+        <label>What size genset is needed to start a 3 phase electric motor Direct on Line (DOL) start</label>
+        <input type="number" v-model.number="hpOfMotor" class="form-control" placeholder="Enter HP"
+          @input="convertHpToKwGenset">
+        <label>=</label>
+        <input type="number" v-model.number="kwForGenset" class="form-control" placeholder="Enter kW"
+          @input="convertKwToHpGenset">
       </div>
     </div>
 
-    <!-- 功率计算器 -->
-    <div class="converter-group power-calculator">
-      <h3 class="converter-title">功率计算器</h3>
-      <label>Phase:</label>
-      <div class="radio-group">
-        <label>
-          <input type="radio" value="1" v-model="phase"> 1
-        </label>
-        <label>
-          <input type="radio" value="3" v-model="phase"> 3
-        </label>
-      </div>
-
-      <label for="volts">Volts Required (V):</label>
-      <input type="number" id="volts" v-model="volts" placeholder="请输入电压">
-
-      <label for="amperes">Amperes (A):</label>
-      <input type="number" id="amperes" v-model="amperes" placeholder="请输入电流">
-
-      <label>Power Factor:</label>
-      <div class="radio-group">
-        <label>
-          <input type="radio" value="0.8" v-model="powerFactor"> 0.8
-        </label>
-        <label>
-          <input type="radio" value="1.0" v-model="powerFactor"> 1.0
-        </label>
-      </div>
-      <input v-if="powerFactor === 'custom'" type="number" v-model="customPowerFactor" placeholder="请输入功率因数 (0.01 - 1)"
-        step="0.01">
-
-      <button class="btn btn-primary" @click="calculatePower">计算 Power kW</button>
-      <div class="result" v-if="calculatedPower !== null">
-        所需功率：{{ calculatedPower }} kW
+    <!-- 第四部分：安培计算 -->
+    <div class="section">
+      <h2 class="mt-5 mb-4">Calculating Amperes (when you know kVA)</h2>
+      <div class="form-group form-inline mb-3">
+        <label>Phase</label>
+        <input type="number" v-model.number="phaseAmp" class="form-control" required @input="calculateAmperes">
+        <label>Generator kVA</label>
+        <input type="number" v-model.number="generatorKva" class="form-control" required @input="calculateAmperes">
+        <label>Volts Required</label>
+        <input type="number" v-model.number="voltsRequiredAmp" class="form-control" required @input="calculateAmperes">
+        <button type="button" class="btn btn-primary" @click="calculateAmperes">Calculate Ampere I</button>
+        <label>=</label>
+        <input type="text" :value="ampereResult ? ampereResult.toFixed(2) : ''" class="form-control" readonly>
       </div>
     </div>
+
+    <!-- 法律免责声明 -->
+    <hr class="my-4">
+    <p class="text-muted"><strong>法律免责声明：</strong><br>
+      涉及复杂的电气计算时，建议咨询持证电工。本页面提供的计算工具仅用于生成一般性估算结果。在大多数情况下，还需考虑许多额外因素（例如海拔、现场条件、铁损、电机效率等）。如果您仍然不确定或需要帮助分析当前情况，欢迎随时联系我们咨询。
+    </p>
   </div>
 
   <script>
     new Vue({
       el: '#app',
       data: {
-        meter: null,
-        inch: null,
-        kva: null,
-        kw: null,
-        phase: '1', // 默认单相
-        volts: null,
-        amperes: null,
-        powerFactor: '0.8', // 默认功率因数
-        customPowerFactor: 0.8, // 自定义功率因数
-        calculatedPower: null // 计算结果
+        phase: '1',
+        volts: 380,
+        amperes: 240,
+        powerFactor: '0.8',
+        powerKwResult: null,
+
+        kwToKva: 480,
+        kvaToKw: 600,
+
+        kwToHp: 50,
+        hpToKw: null,
+
+        hpOfMotor: 85,
+        kwForGenset: null,
+
+        phaseAmp: 1,
+        generatorKva: 500,
+        voltsRequiredAmp: 240,
+        ampereResult: null
+      },
+      watch: {
+        kwToKva: function (newVal) {
+          this.convertKwToKva();
+        },
+        kvaToKw: function (newVal) {
+          this.convertKvaToKw();
+        },
+        kwToHp: function (newVal) {
+          this.convertKwToHp();
+        },
+        hpToKw: function (newVal) {
+          this.convertHpToKw();
+        },
+        hpOfMotor: function (newVal) {
+          this.convertHpToKwGenset();
+        },
+        kwForGenset: function (newVal) {
+          this.convertKwToHpGenset();
+        }
       },
       methods: {
-        convertMeterToInch() {
-          if (this.meter !== null && this.meter !== '') {
-            this.inch = (parseFloat(this.meter) * 39.3701).toFixed(4);
-          } else {
-            this.inch = null;
-          }
-        },
-        convertInchToMeter() {
-          if (this.inch !== null && this.inch !== '') {
-            this.meter = (parseFloat(this.inch) / 39.3701).toFixed(4);
-          } else {
-            this.meter = null;
-          }
-        },
-        convertKvaToKw() {
-          if (this.kva !== null && this.kva !== '') {
-            this.kw = (parseFloat(this.kva) * parseFloat(this.powerFactor)).toFixed(2);
-          } else {
-            this.kw = null;
+        calculatePowerKW() {
+          if (this.phase === '1') {
+            this.powerKwResult = (this.volts * this.amperes * this.powerFactor) / 1000;
+          } else if (this.phase === '3') {
+            this.powerKwResult = (Math.sqrt(3) * this.volts * this.amperes * this.powerFactor) / 1000;
           }
         },
         convertKwToKva() {
-          if (this.kw !== null && this.kw !== '') {
-            this.kva = (parseFloat(this.kw) / parseFloat(this.powerFactor)).toFixed(2);
-          } else {
-            this.kva = null;
-          }
+          this.kvaToKw = this.kwToKva / 0.8; // Assuming default PF = 0.8 for conversion
         },
-        calculatePower() {
-          if (this.volts === null || this.amperes === null || (this.powerFactor === 'custom' && !this.customPowerFactor)) {
-            alert('请确保所有字段都已填写！');
-            return;
+        convertKvaToKw() {
+          this.kwToKva = this.kvaToKw * 0.8; // Reverse conversion
+        },
+        convertKwToHp() {
+          this.hpToKw = this.kwToHp * 1.341; // Conversion factor from kW to HP
+        },
+        convertHpToKw() {
+          this.kwToHp = this.hpToKw / 1.341; // Reverse conversion
+        },
+        convertHpToKwGenset() {
+          this.kwForGenset = this.hpOfMotor / 1.341; // Conversion factor from HP to kW
+        },
+        convertKwToHpGenset() {
+          this.hpOfMotor = this.kwForGenset * 1.341; // Reverse conversion
+        },
+        calculateAmperes() {
+          if (this.phaseAmp === 1) {
+            this.ampereResult = (this.generatorKva * 1000) / (this.voltsRequiredAmp);
+          } else if (this.phaseAmp >= 3) {
+            this.ampereResult = (this.generatorKva * 1000) / (Math.sqrt(3) * this.voltsRequiredAmp);
           }
-
-          const phase = parseFloat(this.phase);
-          const volts = parseFloat(this.volts);
-          const amperes = parseFloat(this.amperes);
-          const powerFactor = this.powerFactor === 'custom' ? parseFloat(this.customPowerFactor) : parseFloat(this.powerFactor);
-
-          let powerKw;
-          if (phase === 1) {
-            // 单相公式：Power kW = (Volts × Amperes × Power Factor) / 1000
-            powerKw = (volts * amperes * powerFactor) / 1000;
-          } else if (phase === 3) {
-            // 三相公式：Power kW = (√3 × Volts × Amperes × Power Factor) / 1000
-            powerKw = (Math.sqrt(3) * volts * amperes * powerFactor) / 1000;
-          }
-          this.calculatedPower = powerKw.toFixed(2);
         }
+      },
+      mounted() {
+        this.calculatePowerKW();
+        this.convertKwToKva();
+        this.convertKwToHp();
+        this.convertHpToKwGenset();
+        this.calculateAmperes();
       }
     });
   </script>
