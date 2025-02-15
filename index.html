@@ -63,7 +63,7 @@
     <!-- 第一部分：信息展示 -->
     <div class="section">
       <h2 class="mb-4">信息展示</h2>
-      <table class="table table-bordered striped-table">
+      <!-- <table class="table table-bordered striped-table">
         <thead>
           <tr>
             <th scope="col">Calculation</th>
@@ -108,6 +108,52 @@
             <td>HP</td>
           </tr>
         </tbody>
+      </table> -->
+      <table class="table table-bordered striped-table">
+        <thead>
+          <tr>
+            <th scope="col">计算</th>
+            <th scope="col">标准单位指南</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>功率计算器</td>
+            <td>千伏安 (kVA)</td>
+            <td>kVA</td>
+          </tr>
+          <tr>
+            <td>将 kVA 转换为 kW</td>
+            <td>千瓦 (1000 瓦 = 1 kW)</td>
+            <td>kW</td>
+          </tr>
+          <tr>
+            <td>将 kW 转换为 kVA</td>
+            <td>安培 （伏安或电流）</td>
+            <td>I</td>
+          </tr>
+          <tr>
+            <td>将千瓦转换为马力</td>
+            <td>伏特</td>
+            <td>E</td>
+          </tr>
+          <tr>
+            <td>已知 kVA 时的安培数</td>
+            <td>功率因数</td>
+            <td>PE</td>
+          </tr>
+          <tr>
+            <td>驱动机所需的千伏安</td>
+            <td>效率百分比</td>
+            <td>%EFF</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>马力</td>
+            <td>HP</td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
@@ -116,7 +162,7 @@
       <h2 class="mb-4">功率需求计算器</h2>
       <div class="form-group form-inline mb-3">
         <div class="wrap-div">
-          <div class="wrap-label">Phase</div>
+          <div class="wrap-label">相位</div>
           <div class="custom-control custom-radio custom-control-inline">
             <input type="radio" id="phase1" v-model="phase" value="1" class="custom-control-input"
               @change="calculatePowerKW">
@@ -129,15 +175,15 @@
           </div>
         </div>
         <div class="wrap-div">
-          <div class="wrap-label">Volts Required (V)</div>
+          <div class="wrap-label">所需电压 (V)</div>
           <input type="number" v-model.number="volts" class="form-control" required @input="calculatePowerKW">
         </div>
         <div class="wrap-div">
-          <div class="wrap-label">Amperes (I)</div>
+          <div class="wrap-label">电流 (I)</div>
           <input type="number" v-model.number="amperes" class="form-control" required @input="calculatePowerKW">
         </div>
         <div class="wrap-div">
-          <div class="wrap-label">Power Factor</div>
+          <div class="wrap-label">功率因数</div>
           <div class="custom-control custom-radio custom-control-inline">
             <input type="radio" id="pf08" v-model="powerFactor" value="0.8" class="custom-control-input"
               @change="calculatePowerKW">
@@ -151,10 +197,10 @@
         </div>
         <div class="wrap-div">
           <div class="wrap-label">=</div>
-          <button type="button" class="btn btn-primary" @click="calculatePowerKW">Calculate</button>
+          <button type="button" class="btn btn-primary" @click="calculatePowerKW">计算</button>
         </div>
         <div class="wrap-div">
-          <div class="wrap-label">Power kW</div>
+          <div class="wrap-label">功率 kW</div>
           <input type="text" :value="powerKwResult ? powerKwResult.toFixed(2) : ''" class="form-control"
             style="width: 150px;" readonly>
         </div>
@@ -166,55 +212,52 @@
       <h2 class="mt-5 mb-4">电力单位换算</h2>
 
       <div class="form-group form-inline mb-3">
-        <label>Converting kW to kVA</label>
+        <label>千瓦 (kW) 转换千伏安 (kVA)</label>
         <input type="number" v-model.number="kwToKva" class="form-control" placeholder="Enter kW"
           @input="convertKwToKva">
-        <label>=</label>
+        <label> = </label>
         <input type="number" v-model.number="kvaToKw" class="form-control" placeholder="Enter kVA"
           @input="convertKvaToKw">
       </div>
 
       <div class="form-group form-inline mb-3">
-        <label>Converting kW to HP</label>
+        <label>千瓦 (kW) 转换马力 (HP)</label>
         <input type="number" v-model.number="kwToHp" class="form-control" placeholder="Enter kW" @input="convertKwToHp">
-        <label>=</label>
+        <label> = </label>
         <input type="number" v-model.number="hpToKw" class="form-control" placeholder="Enter HP" @input="convertHpToKw">
       </div>
 
       <div class="form-group form-inline mb-3">
-        <label>What size genset is needed to start a 3 phase electric motor Direct on Line (DOL)
-          start</label>
-        <input type="number" v-model.number="hpOfMotor" class="form-control" placeholder="Enter HP"
-          @input="convertHpToKwGenset">
+        <label>采用直接在线启动（DOL）方式启动三相发电机时，计算所需发电机功率</label>
+        <input type="number" v-model.number="hpOfMotor" class="form-control" placeholder="Enter HP" @input="convertHpToKwGenset">
         <label>=</label>
-        <input type="number" v-model.number="kwForGenset" class="form-control" placeholder="Enter kW"
-          @input="convertKwToHpGenset">
+        <input type="number" v-model.number="kwForGenset" class="form-control" placeholder="Enter kW" @input="convertKwToHpGenset">
       </div>
     </div>
 
     <!-- 第四部分：安培计算 -->
     <div class="section">
-      <h2 class="mt-5 mb-4">Calculating Amperes (when you know kVA)</h2>
+      <h2 class="mt-5 mb-4">计算电流（已知千伏安 kVA)</h2>
       <div class="form-group form-inline mb-3">
         <div class="wrap-div">
-          <div class="wrap-label">Phase</div>
+          <div class="wrap-label">相位 1,2,3</div>
           <input type="number" v-model.number="phaseAmp" class="form-control" required @input="calculateAmperes">
         </div>
         <div class="wrap-div">
-          <div class="wrap-label">Generator kVA</div>
+          <div class="wrap-label">发电机千伏安 kVA</div>
           <input type="number" v-model.number="generatorKva" class="form-control" required @input="calculateAmperes">
         </div>
         <div class="wrap-div">
-          <div class="wrap-label">Volts Required</div>
+          <div class="wrap-label">所需电压 V</div>
           <input type="number" v-model.number="voltsRequiredAmp" class="form-control" required
             @input="calculateAmperes">
         </div>
         <div class="wrap-div">
           <div class="wrap-label">=</div>
-          <button type="button" class="btn btn-primary" @click="calculateAmperes">Calculate</button>
+          <button type="button" class="btn btn-primary" @click="calculateAmperes">计算</button>
         </div>
         <div class="wrap-div">
-          <div class="wrap-label">Ampere I</div>
+          <div class="wrap-label">电流 I</div>
           <input type="text" :value="ampereResult ? ampereResult.toFixed(2) : ''" class="form-control" readonly>
         </div>
       </div>
