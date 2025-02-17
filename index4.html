@@ -3,11 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>电力计算器</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- <script src="https://cdn.jsdelivr.net/npm/lib-flexible/flexible.js"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <style>
     body {
@@ -55,49 +53,6 @@
 
     .wrap-label {
       height: 50px;
-    }
-
-    .w65-ipt {
-      width: 150px;
-    }
-
-    @media (max-width: 750px) {
-      html {
-        font-size: 12px
-      }
-      .section {
-        padding: 10px;
-      }
-      .wrap-label {
-        height: 40px;
-      }
-      .form-inline input[type="number"] {
-        width: 48px;
-      }
-      .w65-ipt {
-        width: 65px !important;
-      }
-      .w100-ipt {
-        width: 100px !important;
-      }
-      .btn-primary {
-        padding: 5px;
-      }
-      .custom-control-inline {
-        margin-right: 0;
-      }
-      .custom-control-label {
-        margin-right: 0;
-      }
-      .no-mr {
-        margin-right: 0 !important;
-      }
-      .form-inline button {
-        margin-left: 0;
-      }
-      .mr-ml-10 {
-        margin: 0 10px;
-      }
     }
   </style>
 </head>
@@ -211,12 +166,12 @@
           <div class="custom-control custom-radio custom-control-inline">
             <input type="radio" id="phase1" v-model="phase" value="1" class="custom-control-input"
               @change="calculatePowerKW">
-            <label class="custom-control-label no-mr" for="phase1">1</label>
+            <label class="custom-control-label" for="phase1">1</label>
           </div>
           <div class="custom-control custom-radio custom-control-inline">
             <input type="radio" id="phase3" v-model="phase" value="3" class="custom-control-input"
               @change="calculatePowerKW">
-            <label class="custom-control-label no-mr" for="phase3">3</label>
+            <label class="custom-control-label" for="phase3">3</label>
           </div>
         </div>
         <div class="wrap-div">
@@ -232,12 +187,12 @@
           <div class="custom-control custom-radio custom-control-inline">
             <input type="radio" id="pf08" v-model="powerFactor" value="0.8" class="custom-control-input"
               @change="calculatePowerKW">
-            <label class="custom-control-label no-mr" for="pf08">0.8</label>
+            <label class="custom-control-label" for="pf08">0.8</label>
           </div>
           <div class="custom-control custom-radio custom-control-inline">
             <input type="radio" id="pf1" v-model="powerFactor" value="1" class="custom-control-input"
               @change="calculatePowerKW">
-            <label class="custom-control-label no-mr" for="pf1">1</label>
+            <label class="custom-control-label" for="pf1">1</label>
           </div>
         </div>
         <div class="wrap-div">
@@ -246,8 +201,8 @@
         </div>
         <div class="wrap-div">
           <div class="wrap-label">功率 kW</div>
-          <input type="text" :value="powerKwResult ? powerKwResult.toFixed(2) : ''" 
-            class="form-control w65-ipt" readonly>
+          <input type="text" :value="powerKwResult ? powerKwResult.toFixed(2) : ''" class="form-control"
+            style="width: 150px;" readonly>
         </div>
       </div>
     </div>
@@ -258,25 +213,25 @@
 
       <div class="form-group form-inline mb-3">
         <label>千瓦 (kW) 转换千伏安 (kVA)</label>
-        <input type="number" v-model.number="kwToKva" class="form-control w65-ipt" placeholder="Enter kW"
+        <input type="number" v-model.number="kwToKva" class="form-control" placeholder="Enter kW"
           @input="convertKwToKva">
-        <label class="mr-ml-10"> = </label>
-        <input type="number" v-model.number="kvaToKw" class="form-control w65-ipt" placeholder="Enter kVA"
+        <label> = </label>
+        <input type="number" v-model.number="kvaToKw" class="form-control" placeholder="Enter kVA"
           @input="convertKvaToKw">
       </div>
 
       <div class="form-group form-inline mb-3">
         <label>千瓦 (kW) 转换马力 (HP)</label>
-        <input type="number" v-model.number="kwToHp" class="form-control w65-ipt" placeholder="Enter kW" @input="convertKwToHp">
-        <label class="mr-ml-10"> = </label>
-        <input type="number" v-model.number="hpToKw" class="form-control w65-ipt" placeholder="Enter HP" @input="convertHpToKw">
+        <input type="number" v-model.number="kwToHp" class="form-control" placeholder="Enter kW" @input="convertKwToHp">
+        <label> = </label>
+        <input type="number" v-model.number="hpToKw" class="form-control" placeholder="Enter HP" @input="convertHpToKw">
       </div>
 
       <div class="form-group form-inline mb-3">
         <label>采用直接在线启动（DOL）方式启动三相发电机时，计算所需发电机功率</label>
-        <input type="number" v-model.number="hpOfMotor" class="form-control w100-ipt" placeholder="Enter HP" @input="convertHpToKwGenset">
-        <label class="mr-ml-10"> = </label>
-        <input type="number" v-model.number="kwForGenset" class="form-control w100-ipt" placeholder="Enter kW" @input="convertKwToHpGenset">
+        <input type="number" v-model.number="hpOfMotor" class="form-control" placeholder="Enter HP" @input="convertHpToKwGenset">
+        <label>=</label>
+        <input type="number" v-model.number="kwForGenset" class="form-control" placeholder="Enter kW" @input="convertKwToHpGenset">
       </div>
     </div>
 
@@ -303,7 +258,7 @@
         </div>
         <div class="wrap-div">
           <div class="wrap-label">电流 I</div>
-          <input type="text" :value="ampereResult ? ampereResult.toFixed(2) : ''" class="form-control w100-ipt" readonly>
+          <input type="text" :value="ampereResult ? ampereResult.toFixed(2) : ''" class="form-control" readonly>
         </div>
       </div>
     </div>
